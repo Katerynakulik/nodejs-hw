@@ -89,11 +89,13 @@ export const refreshUserSession = async (req, res, next) => {
   });
 };
 
-export const requestResetEmail = async (req, res) => {
+export const requestResetEmail = async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    res.status(200).json({ message: 'Password reset email sent successfully' });
+    return res
+      .status(200)
+      .json({ message: 'Password reset email sent successfully' });
   }
 
   const resetToken = jwt.sign(
@@ -104,7 +106,7 @@ export const requestResetEmail = async (req, res) => {
     },
   );
   const templatePath = path.resolve('src/templates/reset-password-email.html');
-  const templateSource = await fs.readFile(templatePath, 'utf - 8');
+  const templateSource = await fs.readFile(templatePath, 'utf-8');
   const template = handlebars.compile(templateSource);
   const html = template({
     name: user.username,
